@@ -7,8 +7,9 @@ RUN curl -s https://api.github.com/repos/Germanedge/go-exporter/releases/latest 
     | grep "browser_download_url.*\.tar\.gz" \
     | cut -d ":" -f 2,3 \
     | tr -d \" \
-    | wget -qi - \
-    && tar -xf go-exporter.tar.gz -C /usr/bin/ \
+    | tr -d " " \
+    | xargs -I{} curl {} -Lo go-exporter.tar.gz \
+    && tar -xzf go-exporter.tar.gz -C /usr/bin/ \
     && chmod +x /usr/bin/go-exporter \
     && rm -f go-exporter.tar.gz
 ```
