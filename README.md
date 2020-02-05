@@ -25,6 +25,7 @@ go-exporter -port 8080 #Choose a port of your liking
 {
     "service": {
         "meta": {
+            "scrape_path": "/metrics",
             "scrape_port": "8080",
         }
     }
