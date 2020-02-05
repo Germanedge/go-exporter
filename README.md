@@ -1,5 +1,6 @@
 # go-exporter
-Export generic GO metrics to monitor container
+Export generic GO metrics to monitor any container in Prometheus via Consul.
+Useful to monitor container health for services without native Prometheus support.
 
 # Dockerfile
 ```
@@ -17,4 +18,16 @@ RUN curl -s https://api.github.com/repos/Germanedge/go-exporter/releases/latest 
 # entrypointwrapper
 ```
 go-exporter -port 8080 #Choose a port of your liking
+```
+
+# consul.json
+```
+{
+    "service": {
+        "meta": {
+            "scrape_path": "/metrics",
+            "scrape_port": "8080",
+        }
+    }
+}
 ```
