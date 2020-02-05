@@ -18,3 +18,14 @@ RUN curl -s https://api.github.com/repos/Germanedge/go-exporter/releases/latest 
 ```
 go-exporter -port 8080 #Choose a port of your liking
 ```
+
+# consul.json
+```
+{
+    "service": {
+        "meta": {
+            "scrape_port": "8080",
+        }
+    }
+}
+```
