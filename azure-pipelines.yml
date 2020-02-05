@@ -41,7 +41,7 @@ steps:
 - task: CopyFiles@2
   inputs:
     SourceFolder: '$(modulePath)'
-    Contents: '**'
+    Contents: '**/go-exporter'
     TargetFolder: '$(build.artifactstagingdirectory)'
 
 - task: PublishBuildArtifacts@1
