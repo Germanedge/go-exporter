@@ -1,6 +1,6 @@
 # go-exporter
 Export generic GO metrics to monitor any container in Prometheus via Consul.
-Useful to monitor container health for services without native Prometheus support.
+Useful to monitor container health for services without native Prometheus support. 
 
 # Dockerfile
 ```
