@@ -4,9 +4,12 @@
 # https://learn.microsoft.com/en-us/azure/devops/pipelines/ecosystems/go?view=azure-devops&tabs=go-current
 
 
-trigger:
-  - master
-pr: none
+trigger: none
+pr:
+  branches:
+    include:
+      - master
+      - develop
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -17,7 +20,7 @@ steps:
     inputs:
       version: '1.19.2'
   - task: Go@0
-    displayName: 'Get Dependencies'
+    displayName: 'Get dependencies'
     inputs:
       command: 'get'
       arguments: '-d'
@@ -28,14 +31,14 @@ steps:
       command: 'build'
       workingDirectory: '$(System.DefaultWorkingDirectory)'
   - task: CopyFiles@2
-    displayName: 'Copy Files'
+    displayName: 'Copy files'
     inputs:
       sourceFolder: '$(System.DefaultWorkingDirectory)'
       contents: '**/go-exporter'
       targetFolder: '$(Build.ArtifactStagingDirectory)'
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifacts'
+  - task: Go@0
+    displayName: 'Test'
     inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'go-exporter'
-      publishLocation: 'Container'
+      command: 'test'
+      arguments: '-v'
+      workingDirectory: '$(System.DefaultWorkingDirectory)'

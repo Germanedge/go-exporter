@@ -1,10 +1,10 @@
 package main
 
 import (
-	"log"
-	"net/http"
 	"flag"
 	"fmt"
+	"log"
+	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -12,7 +12,7 @@ import (
 func init() {
 	//Metrics have to be registered to be exposed:
 	//Example:
-        //prometheus.MustRegister(cpuTemp)
+	//prometheus.MustRegister(cpuTemp)
 	//prometheus.MustRegister(hdFailures)
 }
 
@@ -22,5 +22,5 @@ func main() {
 	// The Handler function provides a default handler to expose metrics
 	// via an HTTP server. "/metrics" is the usual endpoint for that.
 	http.Handle("/metrics", promhttp.Handler())
-	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s%d" , ":" , *portPtr) , nil))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s%d", ":", *portPtr), nil))
 }
