@@ -38,4 +38,3 @@ steps:
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
       artifactName: 'go-exporter'
-      publishLocation: 'Container'
