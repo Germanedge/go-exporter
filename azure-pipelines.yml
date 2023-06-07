@@ -3,10 +3,12 @@
 # Add steps that test, save build artifacts, deploy, and more:
 # https://learn.microsoft.com/en-us/azure/devops/pipelines/ecosystems/go?view=azure-devops&tabs=go-current
 
-
-trigger:
-  - master
-pr: none
+trigger: none
+pr:
+  branches:
+    include:
+      - master
+      - develop
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -15,7 +17,7 @@ steps:
   - task: GoTool@0
     displayName: 'Install Go'
     inputs:
-      version: '1.20.4'
+      version: '1.20.5'
   - task: Go@0
     displayName: 'Get Dependencies'
     inputs:
