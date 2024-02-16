@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func init() {
@@ -22,11 +21,10 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	portPtr := flag.Int("port", 8080, "Port Number")
 	portPtr := flag.Int("port", 9131, "Port Number")
 	flag.Parse()
 	// The Handler function provides a default handler to expose metrics
 	// via an HTTP server. "/metrics" is the usual endpoint for that.
-	http.Handle("/metrics", promhttp.Handler())
+	http.Handle("/service-name", handleRequest)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s%d", ":", *portPtr), nil))
 }
