@@ -16,6 +16,11 @@ func init() {
 	//prometheus.MustRegister(hdFailures)
 }
 
+func handleRequest(w http.ResponseWriter, r *http.Request) {
+	response := map[string]string{"name": "myname"}
+	json.NewEncoder(w).Encode(response)
+}
+
 func main() {
 	portPtr := flag.Int("port", 8080, "Port Number")
 	portPtr := flag.Int("port", 9131, "Port Number")
