@@ -33,10 +33,10 @@ steps:
     displayName: 'Copy Files'
     inputs:
       sourceFolder: '$(System.DefaultWorkingDirectory)'
-      contents: '**/go-exporter'
+      contents: '**/id-exporter'
       targetFolder: '$(Build.ArtifactStagingDirectory)'
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Artifacts'
     inputs:
       pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'go-exporter'
+      artifactName: 'id-exporter'

@@ -34,7 +34,7 @@ steps:
     displayName: 'Copy files'
     inputs:
       sourceFolder: '$(System.DefaultWorkingDirectory)'
-      contents: '**/go-exporter'
+      contents: '**/id-exporter'
       targetFolder: '$(Build.ArtifactStagingDirectory)'
   - task: Go@0
     displayName: 'Test'
