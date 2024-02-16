@@ -25,6 +25,6 @@ func main() {
 	flag.Parse()
 	// The Handler function provides a default handler to expose metrics
 	// via an HTTP server. "/metrics" is the usual endpoint for that.
-	http.Handle("/service-name", handleRequest)
+	http.HandleFunc("/service-name", handleRequest)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s%d", ":", *portPtr), nil))
 }
