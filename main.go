@@ -18,6 +18,7 @@ func init() {
 
 func main() {
 	portPtr := flag.Int("port", 8080, "Port Number")
+	portPtr := flag.Int("port", 9131, "Port Number")
 	flag.Parse()
 	// The Handler function provides a default handler to expose metrics
 	// via an HTTP server. "/metrics" is the usual endpoint for that.
