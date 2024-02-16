@@ -1,4 +1,4 @@
-module germanedge.com/go-exporter
+module germanedge.com/id-exporter
 
 go 1.20
 
