@@ -1,4 +1,11 @@
-# id-exporter
+# go-exporter
+Export generic GO metrics to monitor any container in Prometheus via Consul. Useful to monitor container health for services without native Prometheus support.
+
+It also offers the /service-name endpoint used in custom consul health checks
+It's default port is set to 9132 via a env variable in the ge-ubuntu-base image. It can be overridden by setting the GO_EXPORTER_PORT environment variable in the dockerfile of you application.
+
+
+Maintainer: Christoph Heuwieser, Julian Daweke, Niels Oldenburg
 
 # Dockerfile
 ```
