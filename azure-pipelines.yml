@@ -34,9 +34,11 @@ extends:
     - stage: automatic_tests
       displayName: 'Automatic tests with SonarQube'
       pool:
-        vmImage: 'ubuntu-22.04'
+        vmImage: 'ubuntu-24.04'
       dependsOn: update_version
       jobs:
+      - job: tests
+        displayName: Tests
         steps:
         - task: GoTool@0
           displayName: 'Install Go'
