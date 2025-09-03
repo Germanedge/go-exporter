@@ -1,42 +1,56 @@
-# Go
-# Build your Go project.
-# Add steps that test, save build artifacts, deploy, and more:
-# https://learn.microsoft.com/en-us/azure/devops/pipelines/ecosystems/go?view=azure-devops&tabs=go-current
+variables:
+- group: Github-credentials
+- group: artifactory-docker
+- name: imageName
+  value: go-exporter  # name of the image
 
-trigger: none
+name: '$(imageName) $(GitVersion.FullSemVer)'
+
+trigger:
+  branches:
+    include:
+    - develop
+
 pr:
   branches:
     include:
-      - master
-      - develop
+    - '*'  # Include all branches for PR triggers
 
-pool:
-  vmImage: 'ubuntu-latest'
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      name: Germanedge/azure-pipelines-templates
+      endpoint: Germanedge
 
-steps:
-  - task: GoTool@0
-    displayName: 'Install Go'
-    inputs:
-      version: '1.20.5'
-  - task: Go@0
-    displayName: 'Get Dependencies'
-    inputs:
-      command: 'get'
-      arguments: '-d'
-      workingDirectory: '$(System.DefaultWorkingDirectory)'
-  - task: Go@0
-    displayName: 'Build'
-    inputs:
-      command: 'build'
-      workingDirectory: '$(System.DefaultWorkingDirectory)'
-  - task: CopyFiles@2
-    displayName: 'Copy Files'
-    inputs:
-      sourceFolder: '$(System.DefaultWorkingDirectory)'
-      contents: '**/go-exporter'
-      targetFolder: '$(Build.ArtifactStagingDirectory)'
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifacts'
-    inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'go-exporter'
+extends:
+  template: azure-pipelines-docker-template.yml@templates
+  parameters:
+    # activates new temlate
+    templateVersion: 2
+    kubernetesManifestBuilding: false
+    stackDefinitionUpdating: false
+    preDockerBuildStages:
+    - stage: automatic_tests
+      displayName: 'Automatic tests with SonarQube'
+      pool:
+        vmImage: 'ubuntu-22.04'
+      dependsOn: update_version
+      jobs:
+        steps:
+        - task: GoTool@0
+          displayName: 'Install Go'
+          inputs:
+            version: '1.25.0'
+        - task: Go@0
+          displayName: 'Get dependencies'
+          inputs:
+            command: get
+            arguments: -d
+            workingDirectory: $(System.DefaultWorkingDirectory)
+        - task: Go@0
+          displayName: Test
+          inputs:
+            command: test
+            arguments: -v
+            workingDirectory: $(System.DefaultWorkingDirectory)
