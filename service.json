@@ -1,0 +1,23 @@
+{
+  "name": "go-exporter",
+  "jsonversion": "4",
+  "description": "Export generic GO metrics to monitor any container in Prometheus via Consul",
+  "homepage": "https://github.com/Germanedge/go-exporter",
+  "keywords": [
+    "golang",
+    "prometheus-metrics"
+  ],
+  "author": "Christoph Heuwieser <christoph.heuwieser@crossvault.com>",
+  "contributors": [
+    "Ferdinand Ritter <ferdinand.ritter@germanedge.com>",
+    "Tomasz Węgrzyn <tomasz.wegrzyn@silevis.com>"
+  ],
+  "repository": {
+    "type": "docker",
+    "url": "germanedge-docker.artifactory.new-solutions.com/edge-one/"
+  },
+  "dockerfile": "Dockerfile",
+  "version": "0.4.0",
+  "profiles": {},
+  "base_images": []
+}
