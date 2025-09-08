@@ -4,20 +4,19 @@ Export generic GO metrics to monitor any container in Prometheus via Consul. Use
 It also offers the /service-name endpoint used in custom consul health checks
 It's default port is set to 9132 via a env variable in the ge-ubuntu-base image. It can be overridden by setting the GO_EXPORTER_PORT environment variable in the dockerfile of you application.
 
+Maintainer: Christoph Heuwieser, Julian Daweke, Ferdinand Ritter
 
-Maintainer: Christoph Heuwieser, Julian Daweke, Niels Oldenburg
+# Usage in Dockerfile
 
-# Dockerfile
+Insert go-exporter via multistage build
+
 ```
-RUN curl -s https://api.github.com/repos/Germanedge/go-exporter/releases/latest \
-    | grep "browser_download_url.*\.tar\.gz" \
-    | cut -d ":" -f 2,3 \
-    | tr -d \" \
-    | tr -d " " \
-    | xargs -I{} curl {} -Lo go-exporter.tar.gz \
-    && tar -xzf go-exporter.tar.gz -C /usr/bin/ \
-    && chmod +x /usr/bin/go-exporter \
-    && rm -f go-exporter.tar.gz
+FROM germanedge-docker.artifactory.new-solutions.com/edge-one/go-exporter:0.5.0 AS go-exporter
+
+FROM  ...
+
+COPY --from=go-exporter /usr/bin/go-exporter /usr/bin/
+RUN chmod +x /usr/bin/go-exporter
 ```
 
 # entrypointwrapper
