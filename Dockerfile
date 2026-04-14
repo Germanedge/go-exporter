@@ -1,4 +1,4 @@
-FROM golang:1.25.0 as build
+FROM golang:1.25.8 as build
 
 RUN mkdir -p /go/src/go-exporter
 WORKDIR /go/src/go-exporter
@@ -9,4 +9,3 @@ COPY main.go .
 RUN go get germanedge.com/go-exporter
 
 RUN CGO_ENABLED=0 go build -a -installsuffix cgo --ldflags "-s -w" -o /usr/bin/go-exporter
-
