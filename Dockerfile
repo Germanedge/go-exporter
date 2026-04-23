@@ -1,4 +1,4 @@
-FROM golang:1.25.8 as build
+FROM golang:1.25.9 as build
 
 RUN mkdir -p /go/src/go-exporter
 WORKDIR /go/src/go-exporter
