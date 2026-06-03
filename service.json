@@ -10,7 +10,7 @@
   "author": "Christoph Heuwieser <christoph.heuwieser@crossvault.com>",
   "contributors": [
     "Ferdinand Ritter <ferdinand.ritter@germanedge.com>",
-    "Tomasz Węgrzyn <tomasz.wegrzyn@silevis.com>"
+    "Tomasz W\u0119grzyn <tomasz.wegrzyn@silevis.com>"
   ],
   "repository": {
     "type": "docker",
@@ -22,7 +22,7 @@
   "base_images": [
     {
       "name": "golang",
-      "version": "1.25.10"
+      "version": "1.25.11"
     }
   ]
 }
