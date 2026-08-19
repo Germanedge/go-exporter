@@ -1,4 +1,4 @@
-FROM golang:1.25.10 as build
+FROM golang:1.25.11 as build
 
 RUN mkdir -p /go/src/go-exporter
 WORKDIR /go/src/go-exporter
