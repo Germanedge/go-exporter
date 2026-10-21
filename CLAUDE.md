@@ -15,10 +15,11 @@ nothing here is ever started from this image.
 
 ## Build
 
-Default port 9132, set via env in `ge-ubuntu-base`; override with
-`GO_EXPORTER_PORT`. Built with `CGO_ENABLED=0` — the binary must stay fully
-static, since the final stage is `scratch` and offers no libc, no shell, and no
-CA bundle.
+Default port **9131**, defined in `main.go` and authoritative. The binary reads
+only the `-port` flag; `GO_EXPORTER_PORT` is consumed by the entrypoint wrapper
+in `ge-ubuntu-base`, which passes it through as `-port`. Built with
+`CGO_ENABLED=0` — the binary must stay fully static, since the final stage is
+`scratch` and offers no libc, no shell, and no CA bundle.
 
 Three properties of the `Dockerfile` are load-bearing. Each exists for a reason
 that is not obvious from reading it:
@@ -36,6 +37,28 @@ that is not obvious from reading it:
 
 The build context is an allowlist in `.dockerignore` — exactly the three files
 the build copies. Adding a source file means adding it there too.
+
+### Go version — three places, one value
+
+There is no single source of truth the tooling can resolve, so the version is
+repeated and must be moved by hand in all three:
+
+| Where | Field |
+| --- | --- |
+| `Dockerfile` | `FROM golang:<version> as build` — the one that ships |
+| `azure-pipelines.yml` | `GoTool@0` → `version` |
+| `azure-pipeline-test.yml` | `GoTool@0` → `version` |
+
+`GoTool@0` cannot read `go.mod`, which is why the pipelines carry literals.
+Letting them drift is not cosmetic: tests and SonarQube then run against a
+different stdlib than the one compiled into the published binary, so a CVE fixed
+by a toolchain bump can still be present in what CI actually validated.
+
+`service.json:base_images[].version` is **not** in this list — CI fills it
+automatically; do not edit it by hand.
+
+`go.mod`'s `go` directive is a different thing: it declares the *language*
+version, not the toolchain, and intentionally stays below it.
 
 ### What `scratch` does and does not provide
 
@@ -98,10 +121,12 @@ as `JIRA_PAT` / `JIRA_URL` — never echo or commit them.
   run `go mod tidy` and review the diff — do not hand-edit the indirect block,
   since removing a genuinely needed indirect breaks the build only at
   `go mod download` time.
-- The two Azure pipelines pin `GoTool@0` to Go **1.25.0** while the image
-  builds with **1.27.3**, so tests and SonarQube run against a different stdlib
-  than the one that ships. `service.json:base_images` is filled by CI and needs
-  no manual edit, but these two pins still drift by hand.
+- Both Azure pipelines still resolve dependencies with `go get -d`, which can
+  mutate `go.mod`. The Docker build was moved to `go mod download` under
+  `-mod=readonly`; until CI follows, it validates a dependency set the image
+  does not necessarily build from. `-d` is also a no-op on modern toolchains.
+- `azure-pipelines.yml` runs a stage named "Automatic tests with SonarQube",
+  but there are no `_test.go` files, so `go test -v` passes vacuously.
 - [GE4-24379](https://jira.germanedge.com/browse/GE4-24379) — architectural
   decision pending on whether `go-exporter` stays standalone or moves into
   `ge-ubuntu-generic`. Java images do not use it at all.
