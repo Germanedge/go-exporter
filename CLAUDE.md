@@ -37,6 +37,31 @@ that is not obvious from reading it:
 The build context is an allowlist in `.dockerignore` — exactly the three files
 the build copies. Adding a source file means adding it there too.
 
+### What `scratch` does and does not provide
+
+The image is a transport container: consumers `COPY --from` the binary into
+their own image and run it there, so `scratch` is not the exporter's runtime.
+It is runnable on its own anyway — `ENTRYPOINT` is declared for that reason.
+
+Nothing is currently missing. `CGO_ENABLED=0` makes the binary fully static, so
+no libc or dynamic linker is needed, and the pure-Go DNS resolver needs no
+`nsswitch.conf`. The `ProcessCollector` that `client_golang` registers into the
+default registry reads `/proc/self/*`, but `/proc` is mounted by the container
+runtime rather than supplied by the image, so it works under `scratch` too.
+
+**The one thing to watch:** `scratch` has no CA bundle. `main.go` only calls
+`http.ListenAndServe` — plain HTTP, inbound only — so none is needed today. The
+moment anything here makes an outbound HTTPS call or serves TLS, certificate
+verification fails with `x509: certificate signed by unknown authority`, and
+the fix is to carry the bundle over from the build stage:
+
+```dockerfile
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+```
+
+The same applies to `time.LoadLocation`, which would need
+`/usr/share/zoneinfo`, or to anything expecting `/tmp` or `/etc/passwd`.
+
 ## Security
 
 CVE handling and the full finding history live in
