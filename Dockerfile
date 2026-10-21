@@ -12,7 +12,10 @@ RUN go mod download
 
 COPY main.go .
 
-RUN CGO_ENABLED=0 go build -a -installsuffix cgo --ldflags "-s -w" -o /usr/bin/go-exporter
+# -trimpath strips local filesystem paths from the binary, so the same source at
+# the same dependency versions produces a byte-identical result regardless of
+# where it was built. -ldflags "-s -w" drops the symbol table and DWARF data.
+RUN CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o /usr/bin/go-exporter
 
 # Final stage: ship only the static binary. The golang build stage inherits
 # buildpack-deps (curl, openssh-client, git, ...) and is discarded here, so none
