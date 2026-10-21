@@ -60,6 +60,21 @@ automatically; do not edit it by hand.
 `go.mod`'s `go` directive is a different thing: it declares the *language*
 version, not the toolchain, and intentionally stays below it.
 
+### Verifying a build change without Docker
+
+The build stage reproduces on a workstation with a matching toolchain, which is
+the fastest way to check a `Dockerfile` change before pushing:
+
+```bash
+GOFLAGS=-mod=readonly CGO_ENABLED=0 go mod download
+GOFLAGS=-mod=readonly CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o /tmp/go-exporter .
+go mod verify
+```
+
+`go mod download` failing under `-mod=readonly` is the signal that `go.mod` or
+`go.sum` is stale — run `go mod tidy` and review the diff rather than letting
+the build rewrite them.
+
 ### What `scratch` does and does not provide
 
 The image is a transport container: consumers `COPY --from` the binary into
@@ -113,14 +128,6 @@ as `JIRA_PAT` / `JIRA_URL` — never echo or commit them.
 
 ## Known open items
 
-- **`go mod tidy` has never been run against the current dependency set.**
-  `gorilla/mux` was removed as a provably unused direct requirement, but the
-  indirect block still lists `matttproud/golang_protobuf_extensions/v2` and
-  `grafana/regexp`, which look like leftovers from older
-  `prometheus/client_golang` releases. Verifying that needs a Go toolchain:
-  run `go mod tidy` and review the diff — do not hand-edit the indirect block,
-  since removing a genuinely needed indirect breaks the build only at
-  `go mod download` time.
 - Both Azure pipelines still resolve dependencies with `go get -d`, which can
   mutate `go.mod`. The Docker build was moved to `go mod download` under
   `-mod=readonly`; until CI follows, it validates a dependency set the image
