@@ -18,7 +18,8 @@ steps:
   - task: GoTool@0
     displayName: 'Install Go'
     inputs:
-      version: '1.25.0'
+      # Keep in sync with the build stage in Dockerfile - see CLAUDE.md.
+      version: '1.27.3'
   - task: Go@0
     displayName: 'Get dependencies'
     inputs:
