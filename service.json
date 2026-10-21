@@ -17,12 +17,16 @@
     "url": "germanedge-docker.artifactory.new-solutions.com/edge-one/"
   },
   "dockerfile": "Dockerfile",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "profiles": {},
   "base_images": [
     {
       "name": "golang",
       "version": "1.27.3"
+    },
+    {
+      "name": "scratch",
+      "version": "latest"
     }
   ]
 }
