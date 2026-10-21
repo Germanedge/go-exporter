@@ -1,12 +1,16 @@
 FROM golang:1.27.3 as build
 
-RUN mkdir -p /go/src/go-exporter
 WORKDIR /go/src/go-exporter
 
-COPY go.mod .
-COPY main.go .
+# Resolve dependencies from the reviewed lockfile only. -mod=readonly makes the
+# build fail when go.mod/go.sum are out of date instead of silently rewriting
+# them, so the shipped binary is built from the dependency set that was reviewed.
+ENV GOFLAGS=-mod=readonly
 
-RUN go get germanedge.com/go-exporter
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY main.go .
 
 RUN CGO_ENABLED=0 go build -a -installsuffix cgo --ldflags "-s -w" -o /usr/bin/go-exporter
 
