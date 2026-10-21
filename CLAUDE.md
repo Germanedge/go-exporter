@@ -20,10 +20,22 @@ Default port 9132, set via env in `ge-ubuntu-base`; override with
 static, since the final stage is `scratch` and offers no libc, no shell, and no
 CA bundle.
 
-The final stage exists for a security reason, not a size reason: the `golang`
-image inherits `buildpack-deps` (curl, openssh-client, git, subversion, gnupg),
-and a single-stage build published every one of those OS packages. **Do not
-collapse the stages back into one.**
+Three properties of the `Dockerfile` are load-bearing. Each exists for a reason
+that is not obvious from reading it:
+
+- **The final `FROM scratch` stage is a security boundary, not a size
+  optimisation.** The `golang` image inherits `buildpack-deps` (curl,
+  openssh-client, git, subversion, gnupg), and a single-stage build published
+  every one of those OS packages. **Do not collapse the stages back into one.**
+- **`GOFLAGS=-mod=readonly` plus `COPY go.mod go.sum` plus `go mod download`**
+  is what makes the committed lockfile authoritative. The previous
+  `go get <module path>` resolved dependencies fresh inside the image, which
+  silently discarded `go.sum` and made Dependabot's gomod PRs cosmetic.
+- **`-trimpath`** keeps builds byte-reproducible across checkouts. Dropping it
+  reintroduces embedded local paths.
+
+The build context is an allowlist in `.dockerignore` — exactly the three files
+the build copies. Adding a source file means adding it there too.
 
 ## Security
 
@@ -53,9 +65,18 @@ as `JIRA_PAT` / `JIRA_URL` — never echo or commit them.
 
 ## Known open items
 
-- `go.sum` is not copied into the build stage; `go get` resolves dependencies
-  unverified against the proxy, so builds are neither reproducible nor
-  supply-chain protected. Fix: `COPY go.sum .` + `go mod download`.
+- **`go mod tidy` has never been run against the current dependency set.**
+  `gorilla/mux` was removed as a provably unused direct requirement, but the
+  indirect block still lists `matttproud/golang_protobuf_extensions/v2` and
+  `grafana/regexp`, which look like leftovers from older
+  `prometheus/client_golang` releases. Verifying that needs a Go toolchain:
+  run `go mod tidy` and review the diff — do not hand-edit the indirect block,
+  since removing a genuinely needed indirect breaks the build only at
+  `go mod download` time.
+- The two Azure pipelines pin `GoTool@0` to Go **1.25.0** while the image
+  builds with **1.27.3**, so tests and SonarQube run against a different stdlib
+  than the one that ships. `service.json:base_images` is filled by CI and needs
+  no manual edit, but these two pins still drift by hand.
 - [GE4-24379](https://jira.germanedge.com/browse/GE4-24379) — architectural
   decision pending on whether `go-exporter` stays standalone or moves into
   `ge-ubuntu-generic`. Java images do not use it at all.
