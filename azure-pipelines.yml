@@ -30,6 +30,11 @@ extends:
     templateVersion: 2
     kubernetesManifestBuilding: false
     stackDefinitionUpdating: false
+    # The published image is FROM scratch - no shell, no /etc/passwd. The
+    # template's validation step runs `docker run --user root --entrypoint sh`
+    # against the image, which cannot start here. There is also nothing to
+    # validate: this image carries one static binary and no Vector config.
+    validateVectorConfig: false
     preDockerBuildStages:
     - stage: automatic_tests
       displayName: 'Automatic tests with SonarQube'
@@ -43,7 +48,8 @@ extends:
         - task: GoTool@0
           displayName: 'Install Go'
           inputs:
-            version: '1.25.0'
+            # Keep in sync with the build stage in Dockerfile - see CLAUDE.md.
+            version: '1.27.3'
         - task: Go@0
           displayName: 'Get dependencies'
           inputs:

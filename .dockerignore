@@ -1,0 +1,8 @@
+# Allowlist, not a blocklist: the build stage copies go.mod, go.sum and main.go
+# and nothing else, so everything else is kept out of the build context by
+# default. This keeps the context - and therefore the build - stable when docs,
+# pipelines or metadata change.
+*
+!go.mod
+!go.sum
+!main.go
