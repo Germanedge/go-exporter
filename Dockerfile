@@ -22,3 +22,9 @@ RUN CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o /usr/bin/go-exporter
 # of its OS-level CVEs reach the published image.
 FROM scratch
 COPY --from=build /usr/bin/go-exporter /usr/bin/go-exporter
+
+# Consumers copy the binary out and never run this image, so this is not how the
+# exporter normally starts. It exists so the image stays runnable on its own -
+# without it `docker run` fails with "no command specified", because scratch
+# contributes no default CMD the way the golang base image did.
+ENTRYPOINT ["/usr/bin/go-exporter"]
