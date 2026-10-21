@@ -100,6 +100,17 @@ COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 The same applies to `time.LoadLocation`, which would need
 `/usr/share/zoneinfo`, or to anything expecting `/tmp` or `/etc/passwd`.
 
+**This is why `azure-pipelines.yml` sets `validateVectorConfig: false`.** The
+shared template's validation step runs
+`docker run --user root --entrypoint sh` against the built image. Under
+`scratch` that fails twice over — `--user root` needs `/etc/passwd` to resolve
+the name, and `--entrypoint sh` needs a shell. The step's own
+`VECTOR_NOT_FOUND` fallback cannot help, because that check executes *inside*
+the container and so presupposes a shell; the `DISABLE_VECTOR` escape hatch is
+unreachable for the same reason. Turning the parameter off is not a workaround:
+this image carries one static binary and will never hold a Vector config.
+Any other shell-less image in the organisation will hit this too.
+
 ## Security
 
 CVE handling and the full finding history live in
